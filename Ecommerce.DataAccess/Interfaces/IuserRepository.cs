@@ -15,5 +15,6 @@ namespace Ecommerce.DataAccess.Repository
         Task<bool> SetPasswordResetTokenAsync(string email, string token);
         Task<string> GetUserEmailByResetTokenAsync(string token);
         Task<bool> ResetPasswordAsync(string email, string newPassword);
+
     }
 }

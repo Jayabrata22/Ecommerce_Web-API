@@ -1,6 +1,8 @@
+using Ecommerce.Business;
 using Ecommerce.Business.Interfaces.Service;
 using Ecommerce.Business.Services;
 using Ecommerce.DataAccess;
+using Ecommerce.DataAccess.Interfaces;
 using Ecommerce.DataAccess.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -60,9 +62,13 @@ namespace Ecommerce.WebAPI
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Ecommerce.WebAPI", Version = "v1" });
             });
+            services.AddAutoMapper(typeof(AutoMapperProfile));
+            services.AddAutoMapper(typeof(ReverseMappingProfile));
             services.AddTransient<IUserService, UserService>(); // For Scoped Lifetime
             services.AddTransient<IuserRepository, UserRepository>();
             services.AddScoped<ImailService, EmailService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IProductRepository, ProductRepository>();
 
         }
 
