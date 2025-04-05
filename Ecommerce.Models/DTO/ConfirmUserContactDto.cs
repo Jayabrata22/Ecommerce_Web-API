@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Models.DTO
 {
-    public class OrderItemDTO
+    public class ConfirmUserContactDto
     {
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
-        public decimal Price { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
     }
-
 }

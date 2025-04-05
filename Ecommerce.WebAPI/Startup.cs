@@ -1,13 +1,14 @@
-using Ecommerce.Business;
-using Ecommerce.Business.Interfaces.Service;
-using Ecommerce.Business.Services;
+﻿using Business.Interfaces;
+using Business.Services;
 using Ecommerce.DataAccess;
-using Ecommerce.DataAccess.Interfaces;
-using Ecommerce.DataAccess.Repository;
+using Ecommerce.DataAccess.Implentation;
+using Ecommerce.DataAccess.Interface;
+using Ecommerce.Models.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApi.Seeder;
 
 namespace Ecommerce.WebAPI
 {
@@ -37,38 +39,56 @@ namespace Ecommerce.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-           options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc();
-            //JWT Token
-            //var key = Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]);
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(options =>
-            //    {
-            //        options.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuer = true,
-            //            ValidateAudience = true,
-            //            ValidateLifetime = true,
-            //            ValidateIssuerSigningKey = true,
-            //            ValidIssuer = Configuration["Jwt:Issuer"],
-            //            ValidAudience = Configuration["Jwt:Audience"],
-            //            IssuerSigningKey = new SymmetricSecurityKey(key)
-            //        };
-            //    });
+            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddTransient<IUserInterface, UserAuthRepository>();
+            services.AddTransient<IAuthInterfaceService, AuthServiceRepository>();
+            services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.User.RequireUniqueEmail = true;
+            });
+            // ✅ JWT Authentication Setup
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = Configuration["JWT:Issuer"],
+                    ValidAudience = Configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Key"]))
+                };
+            });
 
-            //services.AddAuthorization();
+            // ✅ Session Support
+            services.AddSession();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Ecommerce.WebAPI", Version = "v1" });
             });
-            services.AddAutoMapper(typeof(AutoMapperProfile));
-            services.AddAutoMapper(typeof(ReverseMappingProfile));
-            services.AddTransient<IUserService, UserService>(); // For Scoped Lifetime
-            services.AddTransient<IuserRepository, UserRepository>();
-            services.AddScoped<ImailService, EmailService>();
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddDistributedMemoryCache(); // Required for session
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
         }
 
@@ -81,13 +101,12 @@ namespace Ecommerce.WebAPI
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ecommerce.WebAPI v1"));
             }
-
+              
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseSession();
             app.UseAuthentication();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

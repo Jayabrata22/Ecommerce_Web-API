@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Models.DTO
 {
-    public class CartDTO
+    public class PasswordupdateDTO
     {
-        public int BuyerId { get; set; }
-        public List<CartItemDTO> CartItems { get; set; }
-    }
 
+        public string Email { get; set; }
+        public string NewPassword { get; set; }
+
+
+    }
 }
