@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,16 @@ namespace Ecommerce.DataAccess
             : base(options)
         {
         }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Inventory> Inventories { get; set; }
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -23,6 +34,50 @@ namespace Ecommerce.DataAccess
 
             builder.SeedRoles();        // Call role seeder
             builder.SeedSuperAdmin();   // Call user seeder
+
+            builder.Entity<Product>()
+           .HasOne(p => p.Seller)
+           .WithMany()
+           .HasForeignKey(p => p.SellerId);
+
+            builder.Entity<Inventory>()
+                .HasOne(i => i.Product)
+                .WithOne(p => p.Inventory)
+                .HasForeignKey<Inventory>(i => i.ProductId);
+            
+            builder.Entity<Product>()
+                .HasOne(p => p.Category)
+                    .WithMany(c => c.Products)
+                    .HasForeignKey(p => p.CategoryId);
+
+            // Cart -> CartItems
+            builder.Entity<Cart>()
+                .HasMany(c => c.CartItems)
+                .WithOne(ci => ci.Cart)
+                .HasForeignKey(ci => ci.CartId);
+
+            // Order -> OrderItems
+            builder.Entity<Order>()
+                .HasMany(o => o.OrderItems)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey(oi => oi.OrderId);
+
+            // CartItem -> Product
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.Product)
+                .WithMany(p => p.CartItems) // now mapped
+                .HasForeignKey(ci => ci.ProductId);
+
+            // OrderItem -> Product
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Product)
+                .WithMany(p => p.OrderItems) // now mapped
+                .HasForeignKey(oi => oi.ProductId);
+            // Review -> Product
+            builder.Entity<Review>()
+                .HasOne(r => r.Product)
+                .WithMany()
+                .HasForeignKey(r => r.ProductId);
         }
     }
     public static class ModelBuilderExtensions
@@ -85,7 +140,7 @@ namespace Ecommerce.DataAccess
                 PhoneNumber = "8597628237",
                 PhoneNumberConfirmed = true,
                 Name = "Default Seller",
-                Password= "Seller@123",
+                Password = "Seller@123",
                 CreatedAt = new DateTime(2025, 4, 5, 10, 0, 0),
                 UpdatedAt = new DateTime(2025, 4, 5, 10, 0, 0),
                 Address = "456 Seller St, Seller City, Seller State, 67890",

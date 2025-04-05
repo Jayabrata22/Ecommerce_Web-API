@@ -1,8 +1,15 @@
-﻿using Business.Interfaces;
+﻿using AutoMapper;
+using Business.Interfaces;
 using Business.Services;
+using Ecommerce.Business.Serviceinterface;
+using Ecommerce.Business.ServiceRepository;
 using Ecommerce.DataAccess;
 using Ecommerce.DataAccess.Implentation;
+using Ecommerce.DataAccess.Implentation.Customer;
+using Ecommerce.DataAccess.Implentation.Seller;
 using Ecommerce.DataAccess.Interface;
+using Ecommerce.DataAccess.Interface.Customer;
+using Ecommerce.DataAccess.Interface.Seller;
 using Ecommerce.Models.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -42,6 +49,17 @@ namespace Ecommerce.WebAPI
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<IUserInterface, UserAuthRepository>();
             services.AddTransient<IAuthInterfaceService, AuthServiceRepository>();
+            services.AddTransient<IProductInterface, SellerProductRepository>();
+            services.AddTransient<IProductServiceInterface, ProductServiceRepository>();
+            services.AddTransient<IProductCusInterface, CustomerProductRepository>();
+            services.AddTransient<IOrderInterface, orderRepository>();
+            services.AddTransient<IOrderServiceInterface, OrderServiceRepository>();
+            services.AddTransient<ICartInterface, CartRepository>();
+            services.AddTransient<ICartServiceInterface, CartServiceRepository>();
+            services.AddTransient<ICustomerOrderInterface, CustomerOrderRepository>();
+            services.AddTransient<IReviewRepository, ReviewRepository>();
+            services.AddTransient<IReviewService, ReviewService>();
+            services.AddAutoMapper(typeof(AutoMapperProfile));
             services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();

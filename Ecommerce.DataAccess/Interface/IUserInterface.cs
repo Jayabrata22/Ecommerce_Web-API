@@ -1,4 +1,4 @@
-﻿using Ecommerce.Models.DTO;
+﻿using Ecommerce.Models.DTO.UserDTO;
 using Ecommerce.Models.Entity;
 using System;
 using System.Collections.Generic;

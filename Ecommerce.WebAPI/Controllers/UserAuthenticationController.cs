@@ -1,7 +1,9 @@
 ﻿using Business.Interfaces;
 using Business.Services;
-using Ecommerce.Models.DTO;
+using Ecommerce.Models.DTO.UserDTO;
 using Ecommerce.Models.Entity;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -77,6 +79,14 @@ namespace Ecommerce.WebAPI.Controllers
 
             return BadRequest("Invalid email or phone number.");
         }
+
+        [HttpPost("logout")]
+        [AllowAnonymous]
+        public IActionResult PublicLogout()
+        {
+            return Ok(new { message = "Client should clear JWT manually." });
+        }
+
 
     }
 }

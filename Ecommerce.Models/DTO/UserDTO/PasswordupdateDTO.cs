@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Models.DTO
+namespace Ecommerce.Models.DTO.UserDTO
 {
-    public class ConfirmUserContactDto
+    public class PasswordupdateDTO
     {
+
         public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public string NewPassword { get; set; }
+
+
     }
 }

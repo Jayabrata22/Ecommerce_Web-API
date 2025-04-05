@@ -1,7 +1,7 @@
 ﻿using Business.Interfaces;
 using Ecommerce.DataAccess.Implentation;
 using Ecommerce.DataAccess.Interface;
-using Ecommerce.Models.DTO;
+using Ecommerce.Models.DTO.UserDTO;
 using Ecommerce.Models.Entity;
 using System.Threading.Tasks;
 
