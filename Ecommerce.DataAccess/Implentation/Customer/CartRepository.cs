@@ -17,14 +17,20 @@ namespace Ecommerce.DataAccess.Implentation.Customer
         {
             _context = context;
         }
-        public async Task<Cart> GetCartByUserIdAsync(string userId) =>
-         await _context.Carts.Include(c => c.CartItems).ThenInclude(ci => ci.Product)
-             .FirstOrDefaultAsync(c => c.UserId == userId);
+        public async Task<Cart> GetCartByUserIdAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId)) throw new ArgumentNullException(nameof(userId));
+            var result = await _context.Cart.Include(c => c.CartItem).ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            return result;
+        }
+         //await _context.Carts.Include(c => c.CartItems).ThenInclude(ci => ci.Product)
+         //    .FirstOrDefaultAsync(c => c.UserId == userId);
 
         public async Task<Cart> CreateCartAsync(string userId)
         {
-            var cart = new Cart { UserId = userId, CartItems = new List<CartItem>() };
-            _context.Carts.Add(cart);
+            var cart = new Cart { UserId = userId, CartItem = new List<CartItem>() };
+            _context.Cart.Add(cart);
             await _context.SaveChangesAsync();
             return cart;
         }
@@ -32,18 +38,18 @@ namespace Ecommerce.DataAccess.Implentation.Customer
         public async Task AddItemAsync(string userId, int productId, int quantity)
         {
             var cart = await GetCartByUserIdAsync(userId) ?? await CreateCartAsync(userId);
-            var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
+            var existingItem = cart.CartItem.FirstOrDefault(ci => ci.ProductId == productId);
             if (existingItem != null) existingItem.Quantity += quantity;
-            else cart.CartItems.Add(new CartItem { ProductId = productId, Quantity = quantity });
+            else cart.CartItem.Add(new CartItem { ProductId = productId, Quantity = quantity });
             await _context.SaveChangesAsync();
         }
 
         public async Task RemoveItemAsync(int cartItemId)
         {
-            var item = await _context.CartItems.FindAsync(cartItemId);
+            var item = await _context.CartItem.FindAsync(cartItemId);
             if (item != null)
             {
-                _context.CartItems.Remove(item);
+                _context.CartItem.Remove(item);
                 await _context.SaveChangesAsync();
             }
         }

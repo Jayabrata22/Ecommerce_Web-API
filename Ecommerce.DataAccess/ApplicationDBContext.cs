@@ -21,10 +21,10 @@ namespace Ecommerce.DataAccess
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Category> Categories { get; set; }
 
-        public DbSet<Cart> Carts { get; set; }
-        public DbSet<CartItem> CartItems { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Cart> Cart { get; set; }
+        public DbSet<CartItem> CartItem { get; set; }
+        public DbSet<Order> Order { get; set; }
+        public DbSet<OrderItem> OrderItem { get; set; }
         public DbSet<Review> Reviews { get; set; }
 
 
@@ -52,7 +52,7 @@ namespace Ecommerce.DataAccess
 
             // Cart -> CartItems
             builder.Entity<Cart>()
-                .HasMany(c => c.CartItems)
+                .HasMany(c => c.CartItem)
                 .WithOne(ci => ci.Cart)
                 .HasForeignKey(ci => ci.CartId);
 

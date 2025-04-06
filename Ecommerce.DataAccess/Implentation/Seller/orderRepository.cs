@@ -18,11 +18,11 @@ namespace Ecommerce.DataAccess.Implentation.Seller
             _context = context;
         }
         public async Task<IEnumerable<Order>> GetAllOrdersAsync() =>
-         await _context.Orders.Include(o => o.OrderItems).ThenInclude(oi => oi.Product).ToListAsync();
+         await _context.Order.Include(o => o.OrderItems).ThenInclude(oi => oi.Product).ToListAsync();
 
         public async Task UpdateOrderStatusAsync(int orderId, string status)
         {
-            var order = await _context.Orders.FindAsync(orderId);
+            var order = await _context.Order.FindAsync(orderId);
             if (order != null)
             {
                 order.Status = status;

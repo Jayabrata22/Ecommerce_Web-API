@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Interfaces;
 using Business.Services;
+using Ecommerce.Business.CommonService;
 using Ecommerce.Business.Serviceinterface;
 using Ecommerce.Business.ServiceRepository;
 using Ecommerce.DataAccess;
@@ -59,6 +60,7 @@ namespace Ecommerce.WebAPI
             services.AddTransient<ICustomerOrderInterface, CustomerOrderRepository>();
             services.AddTransient<IReviewRepository, ReviewRepository>();
             services.AddTransient<IReviewService, ReviewService>();
+            services.AddTransient<SendMailOnLowInventory>();
             services.AddAutoMapper(typeof(AutoMapperProfile));
             services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()

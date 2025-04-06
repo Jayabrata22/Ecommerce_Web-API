@@ -19,17 +19,17 @@ namespace Ecommerce.DataAccess.Implentation.Customer
         }
         public async Task<Order> CreateOrderAsync(string userId)
         {
-            var cart = await _context.Carts.Include(c => c.CartItems).ThenInclude(ci => ci.Product)
+            var cart = await _context.Cart.Include(c => c.CartItem).ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
-            if (cart == null || !cart.CartItems.Any()) return null;
+            if (cart == null || !cart.CartItem.Any()) return null;
 
             var order = new Order
             {
                 UserId = userId,
                 OrderDate = DateTime.UtcNow,
                 Status = "Pending",
-                TotalAmount = cart.CartItems.Sum(i => i.Product.Price * i.Quantity),
-                OrderItems = cart.CartItems.Select(i => new OrderItem
+                TotalAmount = cart.CartItem.Sum(i => i.Product.Price * i.Quantity),
+                OrderItems = cart.CartItem.Select(i => new OrderItem
                 {
                     ProductId = i.ProductId,
                     Quantity = i.Quantity,
@@ -37,18 +37,18 @@ namespace Ecommerce.DataAccess.Implentation.Customer
                 }).ToList()
             };
 
-            _context.Orders.Add(order);
-            _context.CartItems.RemoveRange(cart.CartItems);
+            _context.Order.Add(order);
+            _context.CartItem.RemoveRange(cart.CartItem);
             await _context.SaveChangesAsync();
             return order;
         }
 
         public async Task<IEnumerable<Order>> GetOrdersByUserAsync(string userId) =>
-            await _context.Orders.Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+            await _context.Order.Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
                 .Where(o => o.UserId == userId).ToListAsync();
 
         public async Task<Order> GetOrderByIdAsync(int orderId) =>
-            await _context.Orders.Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+            await _context.Order.Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
     }

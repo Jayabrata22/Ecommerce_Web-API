@@ -10,6 +10,6 @@ namespace Ecommerce.Models.Entity
     {
         public int Id { get; set; }
         public string UserId { get; set; }
-        public ICollection<CartItem> CartItems { get; set; }
+        public ICollection<CartItem> CartItem { get; set; }
     }
 }

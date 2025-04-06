@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ecommerce.Business.CommonService;
 using Ecommerce.Business.Serviceinterface;
 using Ecommerce.DataAccess.Interface.Customer;
 using Ecommerce.DataAccess.Interface.Seller;
@@ -17,16 +18,19 @@ namespace Ecommerce.Business.ServiceRepository
         private readonly IMapper _mapper;
         private readonly IProductCusInterface _productCusInterface;
         private readonly IProductInterface _productInterface;
+        private readonly SendMailOnLowInventory sendMailOnLowInventory;
 
-        public ProductServiceRepository(IMapper mapper,IProductCusInterface productCusInterface,IProductInterface productInterface)
+        public ProductServiceRepository(IMapper mapper,IProductCusInterface productCusInterface,IProductInterface productInterface, SendMailOnLowInventory sendMailOnLowInventory)
         {
             _mapper = mapper;
             _productCusInterface = productCusInterface;
             _productInterface = productInterface;
+            this.sendMailOnLowInventory = sendMailOnLowInventory;
         }
         public async Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync(string category, string size, decimal? minPrice, decimal? maxPrice)
         {
             var products = await _productCusInterface.GetAllAsync(category, size, minPrice, maxPrice);
+            await sendMailOnLowInventory.CheckLimitofInventory();
             return _mapper.Map<IEnumerable<ProductResponseDto>>(products);
         }
 
