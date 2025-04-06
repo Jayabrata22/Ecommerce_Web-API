@@ -16,13 +16,13 @@ namespace Ecommerce.DataAccess.Implentation
 
         public async Task SubmitReviewAsync(Review review)
         {
-            _context.Reviews.Add(review);
+            _context.Review.Add(review);
             await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Review>> GetReviewsByProductIdAsync(int productId)
         {
-            return await _context.Reviews
+            return await _context.Review
                 .Where(r => r.ProductId == productId)
                 .OrderByDescending(r => r.ReviewDate)
                 .ToListAsync();

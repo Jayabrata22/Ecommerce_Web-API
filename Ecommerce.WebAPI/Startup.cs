@@ -60,6 +60,9 @@ namespace Ecommerce.WebAPI
             services.AddTransient<ICustomerOrderInterface, CustomerOrderRepository>();
             services.AddTransient<IReviewRepository, ReviewRepository>();
             services.AddTransient<IReviewService, ReviewService>();
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<IPaymentRepository, PaymentRepository>();
+
             services.AddTransient<SendMailOnLowInventory>();
             services.AddAutoMapper(typeof(AutoMapperProfile));
             services.AddIdentity<User, IdentityRole>()
@@ -96,6 +99,7 @@ namespace Ecommerce.WebAPI
 
             // ✅ Session Support
             services.AddSession();
+            services.AddSignalR();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -132,6 +136,7 @@ namespace Ecommerce.WebAPI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<OrderHub>("/orderhub"); // SignalR endpoint
             });
         }
     }

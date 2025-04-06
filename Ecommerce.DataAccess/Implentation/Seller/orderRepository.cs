@@ -29,5 +29,14 @@ namespace Ecommerce.DataAccess.Implentation.Seller
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<string> GetSellerIdFromOrderAsync(int orderId)
+        {
+            var orderItem = await _context.OrderItem
+                .Include(oi => oi.Product)
+                .FirstOrDefaultAsync(oi => oi.OrderId == orderId);
+
+            return orderItem?.Product?.SellerId;
+        }
     }
 }

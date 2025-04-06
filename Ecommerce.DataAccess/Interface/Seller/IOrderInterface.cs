@@ -11,5 +11,6 @@ namespace Ecommerce.DataAccess.Interface.Seller
     {
         Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task UpdateOrderStatusAsync(int orderId, string status);
+        Task<string> GetSellerIdFromOrderAsync(int orderId);
     }
 }

@@ -25,7 +25,9 @@ namespace Ecommerce.DataAccess
         public DbSet<CartItem> CartItem { get; set; }
         public DbSet<Order> Order { get; set; }
         public DbSet<OrderItem> OrderItem { get; set; }
-        public DbSet<Review> Reviews { get; set; }
+        public DbSet<Review> Review { get; set; }
+        public DbSet<Payment> Payment { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -78,6 +80,16 @@ namespace Ecommerce.DataAccess
                 .HasOne(r => r.Product)
                 .WithMany()
                 .HasForeignKey(r => r.ProductId);
+
+            builder.Entity<Payment>()
+        .HasOne(p => p.Order)
+        .WithMany()
+        .HasForeignKey(p => p.OrderId);
+
+            builder.Entity<Payment>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
         }
     }
     public static class ModelBuilderExtensions
